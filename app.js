@@ -5,6 +5,7 @@ const path = require("path")
 const httpServer = require("http").createServer();
 const session = require('cookie-session');
 const cookieParser = require('cookie-parser');
+const config = require('./config.json')
 const io = require("socket.io")(httpServer, {
     cors: {
         origin: "ec2-54-237-225-45.compute-1.amazonaws.com",
@@ -86,10 +87,10 @@ io.listen(8001)
 
 mongoose
     .connect(
-        `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.d3tnt.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
+        `mongodb+srv://${config.DB_USER}:${config.DB_PASSWORD}@cluster0.d3tnt.mongodb.net/${config.DB_NAME}?retryWrites=true&w=majority`
     )
     .then(() => {
-        app.listen(process.env.PORT || 8000);
+        app.listen(8000);
     })
     .catch((err) => {
         console.log(err);
