@@ -4,9 +4,9 @@ const Word = require("../models/words")
 const SecretWord = require("../models/secretwords")
 const Posts = require("../models/posts")
 const BusWords = require("../models/busWords")
-
+const config = require('../config')
 const querystring = require('querystring')
-const stripe = require("stripe")(process.env.secretKey )
+const stripe = require("stripe")(config.stripe.secretKey)
 const BusPosts = require("../models/busPosts")
 
 const fs = require("fs")
@@ -256,7 +256,7 @@ const createWord = async (req, res, next) => {
         return next(error)
     }
 
-   
+    console.log(findUser.dictionarys.length)
 
     if (findUser.dictionarys.length === 0) {
         const error = new HttpError("u dont have a dictionary")
@@ -621,7 +621,7 @@ const followADictionary = async (req, res, next) => {
 
     const findDictionary = findUserWithDictionary.dictionarys.find(x => `${x._id}` === `${dictionary}`)
 
-    
+    console.log(findDictionary)
     try {
         findDictionary.followers.push(findUser)
     } catch (err) {
@@ -906,49 +906,13 @@ const userProfile = async (req, res, next) => {
         return next(error)
     }
 
-    let findUserFollowing
-
-    try {
-        findUserFollowing = await User.find({_id: findUser.followingCurrent })
-    } catch (err) {
-        const error = new HttpError("couldnt find the stars you follow")
-        return next(error)
-    }
-
-
-    let findUserFollowers
-
-    try {
-        findUserFollowers = await User.find({_id: findUser.followersCurrent})
-    } catch (err) {
-        const error = new HttpError("couldnt find the stars that follow you")
-        return next(error)        
-    }
-
-
-
-
-    let findPosts 
-
-    try {
-        findPosts = await Posts.find({_id: findUser.posts})
-    } catch (err) {
-        const error = new HttpError("couldnt find your posts")
-        return next(error)
-    }
-
-
-    
 
 
 
 
 
 
-
-
-
-    res.json({ findUser, findUserFollowing, findUserFollowers, findPosts })
+    res.json({ findUser })
 }
 
 
@@ -1372,7 +1336,7 @@ const splashFeed = async (req, res, next) => {
 
     const addUser = concatArrays.concat(findUserPosts)
 
-    
+    console.log(concatArrays)
 
 
     try {
@@ -1872,7 +1836,7 @@ const getBisWords = async (req, res, next) => {
 
     const bisWordsByDate = findBisWords.sort((a, b) => new Date(b.date) - new Date(a.date))
 
-   
+    console.log(req.session)
 
     res.json({ findBisWords, bisWordsByDate, bisWordsByOffer })
 
@@ -1985,11 +1949,7 @@ const updateBusinessDetails = async (req, res, next) => {
         dobDay,
         dobYear,
         phoneNumber,
-        ssn,
-        expMonth,
-        expYear,
-        CVC,
-        cardNumber
+        ssn
 
     } = req.body
 
@@ -2002,26 +1962,15 @@ const updateBusinessDetails = async (req, res, next) => {
         return next(error)
     }
 
-
-
-   let fakeCardToken
-   
-   try {
-       fakeCardToken = await stripe.tokens.create({
+    const fakeCardToken = await stripe.tokens.create({
         card: {
-            number: cardNumber,
-            exp_month: expMonth,
-            exp_year: expYear,
-            cvc: CVC,
+            number: '4000056655665556',
+            exp_month: 9,
+            exp_year: 2022,
+            cvc: '314',
             currency: 'usd'
         },
     });
-   } catch (err) {
-       console.log(err)
-       const error = new HttpError("couldnt create that card")
-       return next(error)
-   }
-   
 
     const fakeBankToken = await stripe.tokens.create({
         bank_account: {
@@ -2092,7 +2041,10 @@ const updateBusinessDetails = async (req, res, next) => {
 
 
 
-                
+                tos_acceptance: {
+                    date: new Date,
+                    ip: req.ip
+                },
                 //external_account: `${fakeCardToken.id}`,
                 individual: {
                     first_name: firstName,
@@ -2653,7 +2605,9 @@ const contractPost = async (req, res, next) => {
     }
 
 
-    
+    console.log(findUser._id)
+
+    console.log(findReceiver)
 
     findReceiver.tookContract = true
     findReceiver.contractedPost = post
@@ -2716,41 +2670,6 @@ const getAUser = async (req, res, next) => {
 
 }
 
-const getPostsYouSponsor = async ( req, res, next) => {
-
-    
-
-    let findUser 
-
-    try {
-        findUser = await User.findById(req.userData.userId)
-    } catch (err) {
-        const error = new HttpError("something went wrong")
-        return next(error)
-    }
-
-    if(!findUser){
-        const error = new HttpError("you're not logged in")
-        return next(error)
-    }
-
-    let findBusPosts
-
-    try {
-        findBusPosts = await BusPosts.find({_id: findUser.sponsorAPost})
-    } catch (err) {
-        const error = new HttpError("couldn't find those sponsorships")
-        return next(error)
-    }
-
-
-    res.json({findBusPosts})
-
-
-}
-
-
-exports.getPostsYouSponsor = getPostsYouSponsor
 
 exports.checkIfHearted = checkIfHearted
 
