@@ -80,7 +80,7 @@ io.on("connection", socket => {
 })
 
 
-io.listen(5001)
+io.listen(8001)
 
 // app.listen(process.env.PORT || 5000);
 
@@ -89,7 +89,7 @@ mongoose
         `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.d3tnt.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
     )
     .then(() => {
-        app.listen(process.env.PORT || 5000);
+        app.listen(process.env.PORT || 8000);
     })
     .catch((err) => {
         console.log(err);
