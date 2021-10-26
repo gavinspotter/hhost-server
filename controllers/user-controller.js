@@ -6,7 +6,7 @@ const Posts = require("../models/posts")
 const BusWords = require("../models/busWords")
 const config = require('../config')
 const querystring = require('querystring')
-const stripe = require("stripe")(config.stripe.secretKey)
+const stripe = require("stripe")(config.secretKey)
 const BusPosts = require("../models/busPosts")
 
 const fs = require("fs")
