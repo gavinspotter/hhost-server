@@ -2671,6 +2671,43 @@ const getAUser = async (req, res, next) => {
 }
 
 
+const getPostsYouSponsor = async ( req, res, next) => {
+
+    
+
+    let findUser 
+
+    try {
+        findUser = await User.findById(req.userData.userId)
+    } catch (err) {
+        const error = new HttpError("something went wrong")
+        return next(error)
+    }
+
+    if(!findUser){
+        const error = new HttpError("you're not logged in")
+        return next(error)
+    }
+
+    let findBusPosts
+
+    try {
+        findBusPosts = await BusPosts.find({_id: findUser.sponsorAPost})
+    } catch (err) {
+        const error = new HttpError("couldn't find those sponsorships")
+        return next(error)
+    }
+
+
+    res.json({findBusPosts})
+
+
+}
+
+
+
+exports.getPostsYouSponsor = getPostsYouSponsor
+
 exports.checkIfHearted = checkIfHearted
 
 exports.getHeartCount = getHeartCount
