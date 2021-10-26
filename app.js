@@ -7,7 +7,7 @@ const session = require('cookie-session');
 const cookieParser = require('cookie-parser');
 const io = require("socket.io")(httpServer, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: "ec2-54-237-225-45.compute-1.amazonaws.com",
         methods: ["GET", "POST"]
     }
 })
